@@ -31,7 +31,13 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 
 ## Estructura de paquetes
 
-- Por decidir.
+- Un paquete por feature dentro de `com.devtalles.rental`, porque el sistema va a crecer. Ejemplo: `catalog` para el catálogo de equipos y `rental` para los alquileres.
+- Dentro de cada feature, un subpaquete por responsabilidad. Ejemplo: `catalog.model.Equipment` y `catalog.mapper.EquipmentMapper`.
+- Las responsabilidades posibles son: `api`, `controller`, `dto`, `mapper`, `model`, `repository` y `service`.
+- Una feature usa de otra solo su subpaquete `api`. Ejemplo: `rental` usa `catalog.api.CatalogApi`, nunca `catalog.repository.EquipmentRepository`.
+- El subpaquete `api` aparece recién cuando otra feature lo necesita.
+- Lo transversal, lo que no es de ninguna feature, vive en `shared`, con un subpaquete por tema. Ejemplo: `shared.error` para el manejo de errores, `shared.config` para la configuración de Spring y `shared.security` para la seguridad. Una utilidad va en el subpaquete del tema al que sirve.
+- Nada transversal va al mismo nivel que las features.
 
 ## Capas
 
