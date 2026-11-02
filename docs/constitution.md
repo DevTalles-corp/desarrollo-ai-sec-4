@@ -47,6 +47,12 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 - El `service` contiene las reglas de negocio y coordina la transacción. Ejemplo: `EquipmentService.createEquipment(...)` verifica que no exista otro equipo con el mismo serial antes de guardarlo.
 - El `repository` se encarga exclusivamente del acceso a datos. Ejemplo: `EquipmentRepository.findBySerial(...)` ejecuta la consulta a PostgreSQL.
 - La anotación `@Transactional` vive en el `service`, nunca en el `controller` ni en el `repository`. Ejemplo: `EquipmentService.createEquipment(...)` es el método anotado, no el endpoint ni el repository.
+- El `controller` recibe y devuelve DTOs; la entidad no sale del `service`. Ejemplo: `EquipmentController.createEquipment(...)` recibe un `EquipmentRequest` y devuelve un `EquipmentResponse`.
+- El `service` recibe y devuelve los mismos DTOs que el `controller`: no hay DTOs propios del `service`. Ejemplo: `EquipmentService.createEquipment(...)` recibe un `EquipmentRequest` y devuelve un `EquipmentResponse`.
+- Los DTOs son `record`; la entidad es una clase. Ejemplo: `EquipmentRequest` y `EquipmentResponse` son records, y `Equipment` es una clase JPA.
+- El mapeo de entidad a DTO y de DTO a entidad vive en una clase mapper por feature, en su subpaquete `mapper`, y la usa el `service`. Ejemplo: `EquipmentService` usa `EquipmentMapper`.
+- El mapper solo convierte datos: la lógica de negocio queda en el `service`. Ejemplo: el estado inicial de un equipo lo decide `EquipmentService`, no `EquipmentMapper`.
+- El formato de la entrada se valida en el DTO con Bean Validation, y el `controller` marca el request con `@Valid`: si no cumple, responde 400. Ejemplo: `@NotBlank` en el nombre del equipo.
 
 ## Interfaces e inyección
 
