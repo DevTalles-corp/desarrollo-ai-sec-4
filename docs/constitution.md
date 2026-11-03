@@ -56,7 +56,13 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 
 ## Interfaces e inyección
 
-- Por decidir.
+- Dentro de una feature, las clases dependen de clases concretas. Ejemplo: `EquipmentController` recibe `EquipmentService`.
+- El repository es la excepción: es una interfaz, porque Spring Data JPA genera su implementación. Ejemplo: `EquipmentRepository` extiende `JpaRepository`.
+- El mapper es un bean con `@Component` y una clase concreta. Ejemplo: `EquipmentMapper` lleva `@Component`.
+- Cuando una feature depende de otra, usa una interfaz por rol, con solo los métodos que necesita, en el subpaquete `api` de la otra feature. Ejemplo: `rental` recibe `catalog.api.CatalogApi`.
+- Dentro de una feature, una interfaz aparece solo cuando la pide un patrón, como Strategy. Ejemplo: `PricingStrategy`, con `DailyPricing` para la tarifa por día y `WeeklyPricing` para la tarifa por semana.
+- Cuando una interfaz tiene varias implementaciones, cada una lleva `@Component` con un nombre, y el service las recibe todas en un `Map<String, Interfaz>` cuya clave es el nombre del bean. El service elige la implementación según el pedido. Ejemplo: `RentalService` recibe `Map<String, PricingStrategy>` y usa `"weekly"` para un alquiler por semana.
+- Las dependencias se inyectan por constructor, con campos `final`. Con un solo constructor no hace falta `@Autowired`. Ejemplo: `EquipmentService` recibe `EquipmentRepository` y `EquipmentMapper` en su constructor.
 
 ## Persistencia
 
