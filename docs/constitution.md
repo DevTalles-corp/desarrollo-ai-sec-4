@@ -66,7 +66,12 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 
 ## Persistencia
 
-- Por decidir.
+- Flyway crea y cambia el esquema, con una migración por cambio. Ejemplo: `V2__add_serial.sql` agrega la columna `serial` a la tabla `equipment`.
+- Las migraciones viven en `src/main/resources/db/migration` y se nombran `V<n>__<descripcion>.sql`. Ejemplo: `V1__create_equipment.sql`.
+- Hibernate solo valida el esquema al arrancar: `ddl-auto: validate`. Ejemplo: si `Equipment` tiene el campo `serial` y la tabla no tiene la columna, la aplicación no arranca.
+- `open-in-view` queda desactivado: la sesión de JPA se abre y se cierra en el service. Ejemplo: `RentalService` arma el `RentalResponse` con `rental.getEquipment().getName()`, y el controller recibe solo el DTO.
+- Desarrollo y tests usan la misma base, `postgres:18`: `compose.yaml` en desarrollo y Testcontainers en los tests.
+- Los tests ejecutan las mismas migraciones de Flyway al arrancar. Ejemplo: un test con Testcontainers arranca con las tablas que crean las migraciones.
 
 ## Errores
 
