@@ -33,7 +33,7 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 
 - Un paquete por feature dentro de `com.devtalles.rental`, porque el sistema va a crecer. Ejemplo: `catalog` para el catálogo de equipos y `rental` para los alquileres.
 - Dentro de cada feature, un subpaquete por responsabilidad. Ejemplo: `catalog.model.Equipment` y `catalog.mapper.EquipmentMapper`.
-- Las responsabilidades posibles son: `api`, `controller`, `dto`, `mapper`, `model`, `repository` y `service`.
+- Las responsabilidades posibles son: `api`, `controller`, `dto`, `exception`, `mapper`, `model`, `repository` y `service`.
 - Una feature usa de otra solo su subpaquete `api`. Ejemplo: `rental` usa `catalog.api.CatalogApi`, nunca `catalog.repository.EquipmentRepository`.
 - El subpaquete `api` aparece recién cuando otra feature lo necesita.
 - Lo transversal, lo que no es de ninguna feature, vive en `shared`, con un subpaquete por tema. Ejemplo: `shared.error` para el manejo de errores, `shared.config` para la configuración de Spring y `shared.security` para la seguridad. Una utilidad va en el subpaquete del tema al que sirve.
@@ -75,7 +75,12 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 
 ## Errores
 
-- Por decidir.
+- El manejo de errores es global: un único handler en `shared.error`, `GlobalExceptionHandler`, con `@RestControllerAdvice` y extendiendo `ResponseEntityExceptionHandler`. Ejemplo: `EquipmentController` no tiene ningún `try/catch`.
+- Todos los errores responden con `ProblemDetail`. Ejemplo: un equipo que no existe responde 404 con `"detail": "No existe el equipo con id 99"`.
+- La validación responde 400 y suma la propiedad `errors`, con cada campo y su mensaje. Ejemplo: `"errors": { "name": "no debe estar vacío" }`.
+- Dos excepciones base viven en `shared.error`: `NotFoundException` (404) y `BusinessRuleException` (409). El handler tiene un método para cada una.
+- Cada feature define sus excepciones en su subpaquete `exception`, extendiendo una de las dos bases y con su propio mensaje. Ejemplo: `catalog.exception.EquipmentNotFoundException` extiende `NotFoundException`.
+- Los errores inesperados los atrapa un método para `Exception`: responde 500 con un `ProblemDetail` genérico, sin detalles técnicos, y registra la traza en el log. Ejemplo: `"detail": "Ocurrió un error inesperado"`.
 
 ## Tests
 
