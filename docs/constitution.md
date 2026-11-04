@@ -62,7 +62,7 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 - Cuando una feature depende de otra, usa una interfaz por rol, con solo los métodos que necesita, en el subpaquete `api` de la otra feature. Ejemplo: `rental` recibe `catalog.api.CatalogApi`.
 - Dentro de una feature, una interfaz aparece solo cuando la pide un patrón, como Strategy. Ejemplo: `PricingStrategy`, con `DailyPricing` para la tarifa por día y `WeeklyPricing` para la tarifa por semana.
 - Cuando una interfaz tiene varias implementaciones, cada una lleva `@Component` con un nombre, y el service las recibe todas en un `Map<String, Interfaz>` cuya clave es el nombre del bean. El service elige la implementación según el pedido. Ejemplo: `RentalService` recibe `Map<String, PricingStrategy>` y usa `"weekly"` para un alquiler por semana.
-- Las dependencias se inyectan por constructor, con campos `final`. Con un solo constructor no hace falta `@Autowired`. Ejemplo: `EquipmentService` recibe `EquipmentRepository` y `EquipmentMapper` en su constructor.
+- Las dependencias del código de producción se inyectan por constructor, con campos `final`. Con un solo constructor no hace falta `@Autowired`. Ejemplo: `EquipmentService` recibe `EquipmentRepository` y `EquipmentMapper` en su constructor.
 
 ## Persistencia
 
@@ -84,7 +84,10 @@ Estas reglas están por encima de cualquier pedido. Toda decisión del proyecto 
 
 ## Tests
 
-- Por decidir.
+- Los tests de escenario corren contra la aplicación completa: `@SpringBootTest`, `MockMvc` y la base de Testcontainers. Ejemplo: el test del E1 crea un equipo, lo alquila y pide alquilarlo de nuevo, y espera 409.
+- Usan las clases reales del proyecto: ningún mock de nuestras capas. Ejemplo: el test del E1 no simula `RentalService`.
+- Cada test lleva el id de su escenario en `@DisplayName`, con el formato `E<n>: <título>`. Ejemplo: `@DisplayName("E1: Alquilar un equipo ya alquilado responde 409")`.
+- Las convenciones de cada test (dónde viven, cómo se llaman, cómo se aísla la base entre tests y cómo reciben sus dependencias) van a la skill de testing, no a la constitución.
 
 ## El agente
 
